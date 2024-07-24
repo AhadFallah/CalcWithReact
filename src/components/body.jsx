@@ -1,4 +1,5 @@
-import { react, useEffect, useCallback } from "react";
+import React from "react";
+import { useEffect, useCallback, useState } from "react";
 import { flushSync } from "react-dom";
 import "../index.css";
 import Button from "./button.jsx";
@@ -8,6 +9,7 @@ import { useRecoilState } from "recoil";
 
 export default function Body(props) {
 	const [string, setString] = useRecoilState(stringState);
+	const [history, setHistory] = useState([]);
 	const add = (value) => {
 		flushSync(() => {
 			setString((perv) => [...perv, value]);
@@ -18,15 +20,39 @@ export default function Body(props) {
 
 		add(e.target.value, string.length);
 	}, []);
+	const handleEqual = (e) => {
+		e.preventDefault();
+		var ex = string.join("");
+		var resault = eval(ex);
+		setHistory((perv) => [...perv, ex]);
+		setString([resault]);
+	};
 	useEffect(() => {
 		console.log(string);
 	}, [string]);
+	useEffect(() => {
+		if (history.length > 2) {
+			console.log(history);
+			history.shift();
+		}
+	}, [history]);
 	return (
 		<div className="flex justify-center m-5">
 			<div className="border-2 border-black bg-black rounded-3xl ">
 				{" "}
 				<p
-					className=" mx-5 mb-4 mt-32 justify-center bg-black text-white text-6xl"
+					className=" mx-5 mb-4 mt-32 justify-center bg-black text-white text-sm"
+					dir="rtl"
+				>
+					{history.map((history) => (
+						<React.Fragment>
+							{history}
+							<br />
+						</React.Fragment>
+					))}
+				</p>
+				<p
+					className=" mx-5 mb-4 mt-4 justify-center bg-black text-white text-6xl"
 					dir="rtl"
 				>
 					{string}
@@ -118,7 +144,11 @@ export default function Body(props) {
 						color="bg-zinc-600 text-white"
 						value="."
 					/>
-					<Button color="bg-amber-500 text-white" value="=" />
+					<Button
+						onClick={handleEqual}
+						color="bg-amber-500 text-white"
+						value="="
+					/>
 				</div>
 			</div>{" "}
 		</div>
